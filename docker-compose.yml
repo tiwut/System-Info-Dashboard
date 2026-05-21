@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  sysinfo-app:
+    build: .
+    container_name: cpp-sysinfo
+    restart: unless-stopped
+    network_mode: "host"
+    pid: "host"
+    volumes:
+      - /:/hostfs:ro

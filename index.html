@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Server Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bar-transition { transition: width 0.5s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-8 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 flex justify-between items-center border-b border-gray-700 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-400">Server Metrics</h1>
+                <p class="text-gray-400 text-sm mt-1">Powered by Custom C++ Backend</p>
+            </div>
+            <div class="text-right">
+                <p id="hostname" class="text-xl font-mono text-white">Loading...</p>
+                <p id="os-kernel" class="text-sm text-gray-400">Loading...</p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">CPU Usage</h2>
+                <p id="cpu-model" class="text-xs text-gray-400 mb-2 truncate" title="CPU Model"></p>
+                <div class="flex justify-between text-sm mb-1">
+                    <span id="cpu-cores">Cores: 0</span>
+                    <span id="cpu-val" class="font-bold text-blue-400">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="cpu-bar" class="bg-blue-500 h-2.5 rounded-full bar-transition" style="width: 0%"></div>
+                </div>
+                <p class="mt-4 text-sm text-gray-400">Active Tasks: <span id="tasks" class="text-gray-200">0</span></p>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">Memory (RAM)</h2>
+                <div class="flex justify-between text-sm mb-1">
+                    <span id="ram-text">0 / 0 MB</span>
+                    <span id="ram-val" class="font-bold text-green-400">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="ram-bar" class="bg-green-500 h-2.5 rounded-full bar-transition" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">Disk Space (/)</h2>
+                <div class="flex justify-between text-sm mb-1">
+                    <span id="disk-text">0 / 0 GB</span>
+                    <span id="disk-val" class="font-bold text-purple-400">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="disk-bar" class="bg-purple-500 h-2.5 rounded-full bar-transition" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg lg:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">Network Traffic (Primary Interface)</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-900 p-4 rounded-lg">
+                        <p class="text-sm text-gray-400">Data Received (Rx)</p>
+                        <p id="net-rx" class="text-2xl font-bold text-yellow-400 mt-1">0 MB</p>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded-lg">
+                        <p class="text-sm text-gray-400">Data Transmitted (Tx)</p>
+                        <p id="net-tx" class="text-2xl font-bold text-pink-400 mt-1">0 MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">System</h2>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide">Uptime</p>
+                        <p id="uptime" class="text-lg text-gray-200">0d 0h 0m</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide">Status</p>
+                        <p class="text-lg text-emerald-400 flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span> Online
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatUptime(seconds) {
+            const d = Math.floor(seconds / (3600*24));
+            const h = Math.floor(seconds % (3600*24) / 3600);
+            const m = Math.floor(seconds % 3600 / 60);
+            return `${d}d ${h}h ${m}m`;
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+
+                document.getElementById('hostname').innerText = data.hostname;
+                document.getElementById('os-kernel').innerText = `${data.os} ${data.kernel}`;
+                document.getElementById('uptime').innerText = formatUptime(data.uptime_seconds);
+
+                document.getElementById('cpu-model').innerText = data.cpu_model;
+                document.getElementById('cpu-cores').innerText = `Cores: ${data.cpu_cores}`;
+                document.getElementById('cpu-val').innerText = `${data.cpu_usage_percent.toFixed(1)}%`;
+                document.getElementById('cpu-bar').style.width = `${data.cpu_usage_percent}%`;
+                document.getElementById('tasks').innerText = data.active_tasks;
+
+                const ramUsed = data.ram_total_mb - data.ram_free_mb;
+                document.getElementById('ram-text').innerText = `${ramUsed} / ${data.ram_total_mb} MB`;
+                document.getElementById('ram-val').innerText = `${data.ram_usage_percent.toFixed(1)}%`;
+                document.getElementById('ram-bar').style.width = `${data.ram_usage_percent}%`;
+
+                const diskUsed = data.disk_total_gb - data.disk_free_gb;
+                document.getElementById('disk-text').innerText = `${diskUsed.toFixed(1)} / ${data.disk_total_gb.toFixed(1)} GB`;
+                document.getElementById('disk-val').innerText = `${data.disk_usage_percent.toFixed(1)}%`;
+                document.getElementById('disk-bar').style.width = `${data.disk_usage_percent}%`;
+
+                document.getElementById('net-rx').innerText = `${data.network_rx_mb.toFixed(2)} MB`;
+                document.getElementById('net-tx').innerText = `${data.network_tx_mb.toFixed(2)} MB`;
+
+            } catch (err) {
+                console.error("Failed to fetch stats", err);
+            }
+        }
+
+        fetchStats();
+        setInterval(fetchStats, 1500);
+    </script>
+</body>
+</html>
