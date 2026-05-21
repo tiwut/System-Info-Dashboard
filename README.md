@@ -11,6 +11,9 @@ A lightning-fast, self-contained system information dashboard. The backend is wr
 
 Because it is compiled directly to machine code in a multi-stage Docker build, this image is exceptionally small and consumes practically zero CPU overhead while monitoring your server.
 
+<img width="1208" height="624" alt="image" src="https://github.com/user-attachments/assets/98882e54-cd46-4743-b60b-4d48688caa61" />
+
+
 ## ✨ Features (14 Real-Time Metrics)
 The dashboard auto-refreshes every 1.5 seconds to display:
 - **System:** Hostname, OS Name, Kernel Version, Uptime, Online Status
