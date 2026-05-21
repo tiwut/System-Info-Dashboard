@@ -6,6 +6,9 @@
 [![GitHub issues](https://img.shields.io/github/issues/tiwut/System-Info-Dashboard?style=flat-square)](https://github.com/tiwut/System-Info-Dashboard/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/tiwut/System-Info-Dashboard?style=flat-square)](https://github.com/tiwut/System-Info-Dashboard/commits/main)
 
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/tiwutdev/system-info-dashboard/latest)
+![Docker Pulls](https://img.shields.io/docker/pulls/tiwutdev/system-info-dashboard)
+
 
 A lightning-fast, self-contained system information dashboard. The backend is written entirely in optimized C++ to directly parse Linux kernel metrics from the `/proc` filesystem, serving them to a beautiful, responsive Tailwind CSS web UI.
 
